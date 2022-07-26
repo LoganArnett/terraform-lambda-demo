@@ -1,5 +1,16 @@
 locals {
-  handlers = jsondecode(file("${path.root}/lambda_config.json"))
+  handler_objects = jsondecode(file("${path.root}/lambda_config.json"))
+  handlers = flatten([
+    for obj in local.handler_objects : [
+      for env in ["dev", "qa", "uat", "ng"] : {
+        name = obj.name
+        method = obj.method
+        path   = obj.path
+        authorization = obj.authorization
+        env = env
+      }
+    ]
+  ])
 }
 
 variable "s3_bucket_name" {
