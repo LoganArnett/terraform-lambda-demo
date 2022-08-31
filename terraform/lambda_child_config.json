@@ -1,0 +1,10 @@
+{
+  "userId": {
+    "name": "userId",
+    "path": "{userId}",
+    "method": "GET",
+    "authorization": "NONE",
+    "parent": "users",
+    "pathParameter": "userId"
+  }
+}

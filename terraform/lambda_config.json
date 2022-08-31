@@ -3,12 +3,21 @@
     "name": "hello",
     "path": "hello",
     "method": "GET",
-    "authorization": "NONE"
+    "authorization": "NONE",
+    "parent": ""
   },
   "goodbye": {
     "name": "goodbye",
     "path": "goodbye",
     "method": "GET",
-    "authorization": "NONE"
+    "authorization": "NONE",
+    "parent": ""
+  },
+  "users": {
+    "name": "users",
+    "path": "users",
+    "method": "POST",
+    "authorization": "NONE",
+    "parent": ""
   }
 }

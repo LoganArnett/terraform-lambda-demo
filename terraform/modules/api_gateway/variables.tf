@@ -1,5 +1,6 @@
 locals {
   handler_objects = jsondecode(file("${path.root}/lambda_config.json"))
+  child_handler_objects = jsondecode(file("${path.root}/lambda_child_config.json"))
   handlers = flatten([
     for obj in local.handler_objects : [
       for env in ["dev", "qa", "uat", "ng"] : {
@@ -7,6 +8,19 @@ locals {
         method = obj.method
         path   = obj.path
         authorization = obj.authorization
+        env = env
+      }
+    ]
+  ])
+  childHandlers = flatten([
+    for obj in local.child_handler_objects : [
+      for env in ["dev", "qa", "uat", "ng"] : {
+        name = obj.name
+        method = obj.method
+        path   = obj.path
+        authorization = obj.authorization
+        parent = obj.parent
+        pathParameter = obj.pathParameter
         env = env
       }
     ]
@@ -30,6 +44,10 @@ variable "api_gateway_account_id" {
 } //value comes from main.tf
 
 variable "lambda_function_arns" {
+  description = "The ARN of the Lambda function"
+} //value comes from main.tf
+
+variable "lambda_function_child_arns" {
   description = "The ARN of the Lambda function"
 } //value comes from main.tf
 
