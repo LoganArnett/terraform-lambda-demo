@@ -10,5 +10,11 @@
     "path": "goodbye",
     "method": "GET",
     "authorization": "NONE"
+  },
+  "gameById": {
+    "name": "gameById",
+    "path": "games/{gameId}",
+    "method": "GET",
+    "authorization": "NONE"
   }
 }

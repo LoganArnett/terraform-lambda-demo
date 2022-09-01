@@ -11,6 +11,12 @@ locals {
       }
     ]
   ])
+  list_handler_names = flatten([
+    for obj in local.handler_objects : [obj.name]
+  ])
+  rest_api_spec = templatefile("${path.root}/api-spec.yml", {
+    aws_region  = "us-east-1"
+  })
 }
 
 variable "rest_api_name" {
