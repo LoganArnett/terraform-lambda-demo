@@ -25,8 +25,10 @@ module "api_gateway" {
   source = "./modules/api_gateway"
   api_gateway_region = var.region
   api_gateway_account_id = var.account_id
-  lambda_function_arns = module.lambda_functions.lambda_function_arn
-  lambda_function_child_arns = module.lambda_functions.lambda_function_arn_child
+  lambda_function_arn_topLevel = module.lambda_functions.lambda_function_arn_topLevel
+  lambda_function_arn_firstChild = module.lambda_functions.lambda_function_arn_firstChild
+  lambda_function_arn_secondChild = module.lambda_functions.lambda_function_arn_secondChild
+  lambda_function_arn_thirdChild = module.lambda_functions.lambda_function_arn_thirdChild
 
   depends_on = [
     module.lambda_functions

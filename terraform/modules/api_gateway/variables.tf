@@ -1,19 +1,19 @@
 locals {
-  handler_objects = jsondecode(file("${path.root}/lambda_config.json"))
-  child_handler_objects = jsondecode(file("${path.root}/lambda_child_config.json"))
-  handlers = flatten([
-    for obj in local.handler_objects : [
+  handlers = jsondecode(file("${path.root}/multi-level-config.json"))
+  topLevel = flatten([
+    for obj in local.handlers.topLevel : [
       for env in ["dev", "qa", "uat", "ng"] : {
         name = obj.name
         method = obj.method
         path   = obj.path
         authorization = obj.authorization
+        hasHandler = obj.hasHandler
         env = env
       }
     ]
   ])
-  childHandlers = flatten([
-    for obj in local.child_handler_objects : [
+  firstChild = flatten([
+    for obj in local.handlers.firstChild : [
       for env in ["dev", "qa", "uat", "ng"] : {
         name = obj.name
         method = obj.method
@@ -21,6 +21,35 @@ locals {
         authorization = obj.authorization
         parent = obj.parent
         pathParameter = obj.pathParameter
+        hasHandler = obj.hasHandler
+        env = env
+      }
+    ]
+  ])
+  secondChild = flatten([
+    for obj in local.handlers.secondChild: [
+      for env in ["dev", "qa", "uat", "ng"] : {
+        name = obj.name
+        method = obj.method
+        path   = obj.path
+        authorization = obj.authorization
+        parent = obj.parent
+        pathParameter = obj.pathParameter
+        hasHandler = obj.hasHandler
+        env = env
+      }
+    ]
+  ])
+  thirdChild = flatten([
+    for obj in local.handlers.thirdChild: [
+      for env in ["dev", "qa", "uat", "ng"] : {
+        name = obj.name
+        method = obj.method
+        path   = obj.path
+        authorization = obj.authorization
+        parent = obj.parent
+        pathParameter = obj.pathParameter
+        hasHandler = obj.hasHandler
         env = env
       }
     ]
@@ -43,11 +72,19 @@ variable "api_gateway_account_id" {
   description = "The account ID in which to create/manage resources"
 } //value comes from main.tf
 
-variable "lambda_function_arns" {
+variable "lambda_function_arn_topLevel" {
   description = "The ARN of the Lambda function"
 } //value comes from main.tf
 
-variable "lambda_function_child_arns" {
+variable "lambda_function_arn_firstChild" {
+  description = "The ARN of the Lambda function"
+} //value comes from main.tf
+
+variable "lambda_function_arn_secondChild" {
+  description = "The ARN of the Lambda function"
+} //value comes from main.tf
+
+variable "lambda_function_arn_thirdChild" {
   description = "The ARN of the Lambda function"
 } //value comes from main.tf
 

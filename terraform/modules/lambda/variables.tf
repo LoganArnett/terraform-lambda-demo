@@ -1,19 +1,19 @@
 locals {
-  handler_objects = jsondecode(file("${path.root}/lambda_config.json"))
-  child_handler_objects = jsondecode(file("${path.root}/lambda_child_config.json"))
-  handlers = flatten([
-    for obj in local.handler_objects : [
+  handlers = jsondecode(file("${path.root}/multi-level-config.json"))
+  topLevel = flatten([
+    for obj in local.handlers.topLevel : [
       for env in ["dev", "qa", "uat", "ng"] : {
         name = obj.name
         method = obj.method
         path   = obj.path
         authorization = obj.authorization
+        hasHandler = obj.hasHandler
         env = env
       }
     ]
   ])
-  childHandlers = flatten([
-    for obj in local.child_handler_objects : [
+  firstChild = flatten([
+    for obj in local.handlers.firstChild : [
       for env in ["dev", "qa", "uat", "ng"] : {
         name = obj.name
         method = obj.method
@@ -21,6 +21,35 @@ locals {
         authorization = obj.authorization
         parent = obj.parent
         pathParameter = obj.pathParameter
+        hasHandler = obj.hasHandler
+        env = env
+      }
+    ]
+  ])
+  secondChild = flatten([
+    for obj in local.handlers.secondChild: [
+      for env in ["dev", "qa", "uat", "ng"] : {
+        name = obj.name
+        method = obj.method
+        path   = obj.path
+        authorization = obj.authorization
+        parent = obj.parent
+        pathParameter = obj.pathParameter
+        hasHandler = obj.hasHandler
+        env = env
+      }
+    ]
+  ])
+  thirdChild = flatten([
+    for obj in local.handlers.thirdChild: [
+      for env in ["dev", "qa", "uat", "ng"] : {
+        name = obj.name
+        method = obj.method
+        path   = obj.path
+        authorization = obj.authorization
+        parent = obj.parent
+        pathParameter = obj.pathParameter
+        hasHandler = obj.hasHandler
         env = env
       }
     ]
