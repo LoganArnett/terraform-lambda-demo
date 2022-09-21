@@ -1,0 +1,78 @@
+{
+    "topLevel": {
+      "hello": {
+        "name": "hello",
+        "path": "hello",
+        "method": "GET",
+        "authorization": "NONE",
+        "parent": "",
+        "hasHandler": "true"
+      },
+      "goodbye": {
+        "name": "goodbye",
+        "path": "goodbye",
+        "method": "GET",
+        "authorization": "NONE",
+        "parent": "",
+        "hasHandler": "true"
+      },
+      "users": {
+        "name": "users",
+        "path": "users",
+        "method": "POST",
+        "authorization": "NONE",
+        "parent": "",
+        "hasHandler": "true"
+      },
+      "mediakind": {
+        "name": "mediakind",
+        "path": "mediakind",
+        "method": "POST",
+        "authorization": "NONE",
+        "parent": "",
+        "hasHandler": "false"
+      }
+    },
+    "firstChild": {
+      "userId": {
+        "name": "userId",
+        "path": "{userId}",
+        "method": "GET",
+        "authorization": "NONE",
+        "parent": "users",
+        "pathParameter": "userId",
+        "hasHandler": "true"
+      },
+      "games": {
+        "name": "games",
+        "path": "games",
+        "method": "GET",
+        "authorization": "NONE",
+        "parent": "mediakind",
+        "pathParameter": "",
+        "hasHandler": "false"
+      }
+    },
+    "secondChild": {
+      "gameId": {
+        "name": "gameId",
+        "path": "{gameId}",
+        "method": "GET",
+        "authorization": "NONE",
+        "parent": "games",
+        "pathParameter": "",
+        "hasHandler": "false"
+      }
+    },
+    "thirdChild": {
+      "play-options": {
+        "name": "play-options",
+        "path": "play-options",
+        "method": "GET",
+        "authorization": "NONE",
+        "parent": "gameId",
+        "pathParameter": "play-options",
+        "hasHandler": "true"
+      }
+    }
+}

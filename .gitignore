@@ -50,7 +50,7 @@ Thumbs.db
 
 # Terraform
 .terraform*
-terraform*
+terraform.*
 *.bkp
 *.zip
 local.default.tfvars
