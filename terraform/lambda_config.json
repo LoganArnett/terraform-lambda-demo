@@ -1,23 +1,57 @@
 {
-  "hello": {
-    "name": "hello",
-    "path": "hello",
-    "method": "GET",
-    "authorization": "NONE",
-    "parent": ""
+  "topLevel": {
+    "hello": {
+      "name": "hello",
+      "path": "hello",
+      "method": "GET",
+      "authorization": "NONE",
+      "parent": ""
+    },
+    "goodbye": {
+      "name": "goodbye",
+      "path": "goodbye",
+      "method": "GET",
+      "authorization": "NONE",
+      "parent": ""
+    },
+    "users": {
+      "name": "users",
+      "path": "users",
+      "method": "POST",
+      "authorization": "NONE",
+      "parent": ""
+    }
   },
-  "goodbye": {
-    "name": "goodbye",
-    "path": "goodbye",
-    "method": "GET",
-    "authorization": "NONE",
-    "parent": ""
+  "firstChild": {
+    "userId": {
+      "name": "userId",
+      "path": "{userId}",
+      "method": "GET",
+      "authorization": "NONE",
+      "parent": "users",
+      "pathParameter": "userId"
+    }
   },
-  "users": {
-    "name": "users",
-    "path": "users",
-    "method": "POST",
-    "authorization": "NONE",
-    "parent": ""
+  "secondChild": {
+    "userPrograms": {
+      "name": "userPrograms",
+      "path": "programs",
+      "method": "",
+      "authorization": "",
+      "parent": "userId",
+      "pathParameter": "",
+      "parentIsChild": true
+    }
+  },
+  "thirdChild": {
+    "userProgramsById": {
+      "name": "userProgramsById",
+      "path": "{programId}",
+      "method": "GET",
+      "authorization": "NONE",
+      "parent": "userPrograms",
+      "pathParameter": "programId",
+      "parentIsChild": true
+    }
   }
 }

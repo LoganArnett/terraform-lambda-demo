@@ -1,8 +1,7 @@
 locals {
   handler_objects = jsondecode(file("${path.root}/lambda_config.json"))
-  child_handler_objects = jsondecode(file("${path.root}/lambda_child_config.json"))
   handlers = flatten([
-    for obj in local.handler_objects : [
+    for obj in local.handler_objects.topLevel : [
       for env in ["dev", "qa", "uat", "ng"] : {
         name = obj.name
         method = obj.method
@@ -12,8 +11,34 @@ locals {
       }
     ]
   ])
-  childHandlers = flatten([
-    for obj in local.child_handler_objects : [
+  firstChildHandlers = flatten([
+    for obj in local.handler_objects.firstChild : [
+      for env in ["dev", "qa", "uat", "ng"] : {
+        name = obj.name
+        method = obj.method
+        path   = obj.path
+        authorization = obj.authorization
+        parent = obj.parent
+        pathParameter = obj.pathParameter
+        env = env
+      }
+    ]
+  ])
+  secondChildHandlers = flatten([
+    for obj in local.handler_objects.secondChild : [
+      for env in ["dev", "qa", "uat", "ng"] : {
+        name = obj.name
+        method = obj.method
+        path   = obj.path
+        authorization = obj.authorization
+        parent = obj.parent
+        pathParameter = obj.pathParameter
+        env = env
+      }
+    ]
+  ])
+  thirdChildHandlers = flatten([
+    for obj in local.handler_objects.thirdChild : [
       for env in ["dev", "qa", "uat", "ng"] : {
         name = obj.name
         method = obj.method
@@ -48,6 +73,14 @@ variable "lambda_function_arns" {
 } //value comes from main.tf
 
 variable "lambda_function_child_arns" {
+  description = "The ARN of the Lambda function"
+} //value comes from main.tf
+
+variable "lambda_function_second_child_arns" {
+  description = "The ARN of the Lambda function"
+} //value comes from main.tf
+
+variable "lambda_function_third_child_arns" {
   description = "The ARN of the Lambda function"
 } //value comes from main.tf
 

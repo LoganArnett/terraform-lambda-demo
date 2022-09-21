@@ -6,5 +6,23 @@
     "authorization": "NONE",
     "parent": "users",
     "pathParameter": "userId"
+  },
+  "userPrograms": {
+    "name": "userPrograms",
+    "path": "programs",
+    "method": "",
+    "authorization": "",
+    "parent": "userId",
+    "pathParameter": "",
+    "parentIsChild": true
+  },
+  "userProgramsById": {
+    "name": "userProgramsById",
+    "path": "{programId}",
+    "method": "GET",
+    "authorization": "NONE",
+    "parent": "userPrograms",
+    "pathParameter": "programId",
+    "parentIsChild": true
   }
 }

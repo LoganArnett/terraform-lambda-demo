@@ -10,7 +10,28 @@ data "archive_file" "lambda_code" {
 
 data "archive_file" "lambda_code_child" {
   for_each = {
-    for inst in local.childHandlers : "${inst.name}-${inst.env}" => inst
+    for inst in local.firstChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  type        = "zip"
+  source_dir  = "${path.root}/../handlers/${each.value.name}"
+  output_path = "${path.root}/../${each.value.name}.zip"
+}
+
+data "archive_file" "lambda_code_second_child" {
+  for_each = {
+    for inst in local.secondChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  type        = "zip"
+  source_dir  = "${path.root}/../handlers/${each.value.name}"
+  output_path = "${path.root}/../${each.value.name}.zip"
+}
+
+data "archive_file" "lambda_code_third_child" {
+  for_each = {
+    for inst in local.thirdChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
   }
   type        = "zip"
   source_dir  = "${path.root}/../handlers/${each.value.name}"
@@ -39,12 +60,35 @@ resource "aws_s3_object" "lambda_code" {
 
 resource "aws_s3_object" "lambda_code_child" {
   for_each = {
-    for inst in local.childHandlers : "${inst.name}-${inst.env}" => inst
+    for inst in local.firstChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
   }
   bucket = aws_s3_bucket.lambda_bucket.id
   key    = "${each.value.name}.zip"
   source = data.archive_file.lambda_code_child[each.key].output_path
   etag   = filemd5(data.archive_file.lambda_code_child[each.key].output_path)
+}
+
+resource "aws_s3_object" "lambda_code_second_child" {
+  for_each = {
+    for inst in local.secondChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  bucket = aws_s3_bucket.lambda_bucket.id
+  key    = "${each.value.name}.zip"
+  source = data.archive_file.lambda_code_second_child[each.key].output_path
+  etag   = filemd5(data.archive_file.lambda_code_second_child[each.key].output_path)
+}
+
+resource "aws_s3_object" "lambda_code_third_child" {
+  for_each = {
+    for inst in local.thirdChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  bucket = aws_s3_bucket.lambda_bucket.id
+  key    = "${each.value.name}.zip"
+  source = data.archive_file.lambda_code_third_child[each.key].output_path
+  etag   = filemd5(data.archive_file.lambda_code_third_child[each.key].output_path)
 }
 
 resource "aws_lambda_function" "lambda_function" {
@@ -62,7 +106,8 @@ resource "aws_lambda_function" "lambda_function" {
 
 resource "aws_lambda_function" "lambda_function_child" {
   for_each = {
-    for inst in local.childHandlers : "${inst.name}-${inst.env}" => inst
+    for inst in local.firstChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
   }
   function_name    = "${each.value.name}-handler-${each.value.env}"
   s3_bucket        = aws_s3_bucket.lambda_bucket.id
@@ -71,6 +116,34 @@ resource "aws_lambda_function" "lambda_function_child" {
   handler          = "index.handler"
   source_code_hash = data.archive_file.lambda_code_child[each.key].output_base64sha256
   role             = aws_iam_role.lambda_execution_role_child[each.key].arn
+}
+
+resource "aws_lambda_function" "lambda_function_second_child" {
+  for_each = {
+    for inst in local.secondChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  function_name    = "${each.value.name}-handler-${each.value.env}"
+  s3_bucket        = aws_s3_bucket.lambda_bucket.id
+  s3_key           = aws_s3_object.lambda_code_second_child[each.key].key
+  runtime          = "nodejs16.x"
+  handler          = "index.handler"
+  source_code_hash = data.archive_file.lambda_code_second_child[each.key].output_base64sha256
+  role             = aws_iam_role.lambda_execution_role_second_child[each.key].arn
+}
+
+resource "aws_lambda_function" "lambda_function_third_child" {
+  for_each = {
+    for inst in local.thirdChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  function_name    = "${each.value.name}-handler-${each.value.env}"
+  s3_bucket        = aws_s3_bucket.lambda_bucket.id
+  s3_key           = aws_s3_object.lambda_code_third_child[each.key].key
+  runtime          = "nodejs16.x"
+  handler          = "index.handler"
+  source_code_hash = data.archive_file.lambda_code_third_child[each.key].output_base64sha256
+  role             = aws_iam_role.lambda_execution_role_third_child[each.key].arn
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
@@ -83,7 +156,26 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 
 resource "aws_cloudwatch_log_group" "lambda_log_group_child" {
   for_each = {
-    for inst in local.childHandlers : "${inst.name}-${inst.env}" => inst
+    for inst in local.firstChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  name              = "/aws/lambda/${each.value.name}-handler-${each.value.env}"
+  retention_in_days = 7
+}
+
+resource "aws_cloudwatch_log_group" "lambda_log_group_second_child" {
+  for_each = {
+    for inst in local.secondChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  name              = "/aws/lambda/${each.value.name}-handler-${each.value.env}"
+  retention_in_days = 7
+}
+
+resource "aws_cloudwatch_log_group" "lambda_log_group_third_child" {
+  for_each = {
+    for inst in local.thirdChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
   }
   name              = "/aws/lambda/${each.value.name}-handler-${each.value.env}"
   retention_in_days = 7
@@ -111,9 +203,52 @@ resource "aws_iam_role" "lambda_execution_role" {
 
 resource "aws_iam_role" "lambda_execution_role_child" {
   for_each = {
-    for inst in local.childHandlers : "${inst.name}-${inst.env}" => inst
+    for inst in local.firstChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
   }
   name = "lambda_execution_role_child_${each.value.name}-handler-${each.value.env}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Sid    = ""
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "lambda_execution_role_second_child" {
+  for_each = {
+    for inst in local.secondChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  name = "lambda_execution_role_second_child_${each.value.name}-handler-${each.value.env}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Sid    = ""
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "lambda_execution_role_third_child" {
+  for_each = {
+    for inst in local.thirdChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  name = "lambda_execution_role_third_child_${each.value.name}-handler-${each.value.env}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -139,8 +274,27 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_child" {
   for_each = {
-    for inst in local.childHandlers : "${inst.name}-${inst.env}" => inst
+    for inst in local.firstChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
   }
   role       = aws_iam_role.lambda_execution_role_child[each.key].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_second_child" {
+  for_each = {
+    for inst in local.secondChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  role       = aws_iam_role.lambda_execution_role_second_child[each.key].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_third_child" {
+  for_each = {
+    for inst in local.thirdChildHandlers : "${inst.name}-${inst.env}" => inst
+    if length(inst.method) > 0
+  }
+  role       = aws_iam_role.lambda_execution_role_third_child[each.key].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
